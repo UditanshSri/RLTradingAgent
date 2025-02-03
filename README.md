@@ -164,6 +164,21 @@ plt.legend()
 plt.grid()
 plt.show()
 ```
+## PnL (Profit & Loss)
+
+Simple reward function that measures the total profit/loss or return obtained on day. Leads to issues such as early convergence of model.
+
+Reward = Current Portfolio Value – Previous Portfolio Value
+
+
+| day: 2515, episode: 0  |
+| -- |
+| begin_total_asset: 10000.00  |
+| end_total_asset: 67467.96  |
+| total_reward: 57467.96  |
+| total_cost: 907.57  |
+| total_trades: 2515  |
+| Sharpe: 0.811  |
 
 ---
 
