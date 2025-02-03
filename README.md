@@ -164,21 +164,7 @@ plt.legend()
 plt.grid()
 plt.show()
 ```
-## PnL (Profit & Loss)
 
-Simple reward function that measures the total profit/loss or return obtained on day. Leads to issues such as early convergence of model.
-
-Reward = Current Portfolio Value – Previous Portfolio Value
-
-
-| day: 2515, episode: 0  |
-| -- |
-| begin_total_asset: 10000.00  |
-| end_total_asset: 67467.96  |
-| total_reward: 57467.96  |
-| total_cost: 907.57  |
-| total_trades: 2515  |
-| Sharpe: 0.811  |
 ![](https://web-api.textin.com/ocr_image/external/f07f35cad64f1308.jpg)
 
 ---
@@ -198,3 +184,30 @@ Reward = Current Portfolio Value – Previous Portfolio Value
 ---
 
 **Author:** RL Trading Project Team
+=======
+
+
+
+![](https://web-api.textin.com/ocr_image/external/f07f35cad64f1308.jpg)
+
+# Moving Average of Return 
+
+Smooths the return over a period to reduce volatility.
+
+$R e w a r d = \frac { 1 } { N } \sum _ { i = 1 } ^ { N } F$Return
+
+## Custom Reward Function
+
+Balances return with risk using hyperparameters α and β
+
+Reward = α×return_moving_average − β×downside_return
+
+where α,β are hyperparameters that control the weight of return and risk.
+
+## Differential Return 
+
+https://www.researchgate.net/publication/356127405_Portfolio_Performance_and Risk_Penalty_Measurement_with_Differential_Return 
+
+Algorithm Used:
+
+Proximal Policy Optimization (PPO)
