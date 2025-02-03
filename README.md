@@ -10,6 +10,10 @@ This project implements a Reinforcement Learning (RL) agent for stock trading us
 ### Environment
 - **Custom Stock Trading Environment**: Extends `StockTradingEnv` from the FinRL library.
 - **Market Simulation**: The environment mimics real-world trading, handling transactions, stock holdings, and portfolio management.
+
+### Actions
+Actions involve placing trades such as buying, selling, or holding stocks. More formally:
+
 - **Action Space**:
   - The action is a continuous value `𝒜 ∈ [-1,1]`, scaled by `hmax` (the max number of stocks the agent can trade at a time):
     
