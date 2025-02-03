@@ -179,6 +179,7 @@ Reward = Current Portfolio Value – Previous Portfolio Value
 | total_cost: 907.57  |
 | total_trades: 2515  |
 | Sharpe: 0.811  |
+![](https://web-api.textin.com/ocr_image/external/f07f35cad64f1308.jpg)
 
 ---
 
