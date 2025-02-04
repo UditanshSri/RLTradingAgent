@@ -55,7 +55,7 @@ state_space = 1 + 2 * stock_dim + len(indicators) * stock_dim
 ## Tools and Libraries
 
 - **Python 3**
-- **Kaggle Notebooks
+- **Kaggle Notebooks**
 - **NumPy & Pandas**: Data manipulation and processing.
 - **Matplotlib & Seaborn**: Visualization.
 - **Yahoo Finance API (`yfinance`)**: Stock data fetching.
