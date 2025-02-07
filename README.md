@@ -1,7 +1,32 @@
-# RLTradingAgent
+# RLTradingAgent Readme
 
-## Overview
+<h1 align="center">RLTradingAgent</h1>
+<p align="center">
+</p>
+<a href="https://weekendofcode.computercodingclub.in/"> <img src="https://i.postimg.cc/njCM24kx/woc.jpg" height=30px> </a>
+
+## Introduction:
 This project implements a Reinforcement Learning (RL) agent for stock trading using the FinRL library. The agent interacts with a custom trading environment based on OpenAI Gym, making buy, sell, or hold decisions to maximize portfolio returns. The core RL algorithm used is **Proximal Policy Optimization (PPO)** from Stable Baselines3.
+
+---
+
+## Table of Contents:
+- [Methodology](#methodology)
+- [Tools and Libraries](#tools-and-libraries)
+- [Data Collection](#data-collection)
+- [Reward Function](#reward-function)
+- [RL Model Implementation](#rl-model-implementation)
+- [Results & Evaluation](#results--evaluation)
+- [Conclusion](#conclusion)
+- [References](#references)
+
+## Technology Stack:
+1) Python 3  
+2) FinRL  
+3) Stable Baselines3  
+4) OpenAI Gym  
+5) Yahoo Finance API  
+6) NumPy, Pandas, Matplotlib, Seaborn
 
 ---
 
@@ -12,96 +37,115 @@ This project implements a Reinforcement Learning (RL) agent for stock trading us
 - **Market Simulation**: The environment mimics real-world trading, handling transactions, stock holdings, and portfolio management.
 
 ### Actions
-Actions involve placing trades such as buying, selling, or holding stocks. More formally:
-
-- **Action Space**:
-  - The action is a continuous value `𝒜 ∈ [-1,1]`, scaled by `hmax` (the max number of stocks the agent can trade at a time):
-    
-    ```
-    hmax = ⌊ initial_amount / max_price ⌋
-    ```
-  - The action space is defined as:
-    
-    ```
-    A = stock_dim * 𝒜
-    ```
-- **Transaction Costs**:
-  - Buy/Sell costs: **0.1%** per transaction.
-- **Turbulence Threshold**:
-  - Restricts excessive trading in volatile markets.
-
-### State Space
-
-```python
-state_space = 1 + 2 * stock_dim + len(indicators) * stock_dim
-```
-
-- `1`: Portfolio value.
-- `2 * stock_dim`: Stock holdings and prices.
-- `len(indicators) * stock_dim`: Technical indicators per stock.
+Actions involve placing trades such as buying, selling, or holding stocks.
+- **Transaction Costs**: 0.1% per transaction.
+- **Turbulence Threshold**: Restricts excessive trading in volatile markets.
 
 ### Technical Indicators Used
-- **Volume**: Total number of shares traded.
-- **MACD (Moving Average Convergence Divergence)**: Trend-following indicator.
-- **Bollinger Bands (Upper & Lower)**: Identify overbought/oversold conditions.
-- **RSI (Relative Strength Index, 30-period)**: Measures momentum.
-- **CCI (Commodity Channel Index, 30-period)**: Identifies trends.
-- **DX (Directional Movement Index, 30-period)**: Measures trend strength.
-- **SMA (Simple Moving Averages, 30 & 60 periods)**: Smooths price fluctuations.
-- **Turbulence**: Market volatility measure.
+- **Volume**  
+- **MACD**  
+- **Bollinger Bands**  
+- **RSI**  
+- **CCI**  
+- **DX**  
+- **SMA (30 & 60 periods)**  
+- **Turbulence**
 
 ---
 
 ## Tools and Libraries
 
-- **Python 3**
-- **Kaggle Notebooks**
-- **NumPy & Pandas**: Data manipulation and processing.
-- **Matplotlib & Seaborn**: Visualization.
-- **Yahoo Finance API (`yfinance`)**: Stock data fetching.
-- **FinRL**: RL environment and preprocessing tools.
-- **Stable Baselines3 (PPO)**: RL agent implementation.
+- **Python 3**  
+- **Kaggle Notebooks**  
+- **NumPy & Pandas**  
+- **Matplotlib & Seaborn**  
+- **Yahoo Finance API (`yfinance`)**  
+- **FinRL**  
+- **Stable Baselines3 (PPO)**
 
 ---
 
 ## Data Collection
-
-Stock data is fetched using `YahooDownloader` from FinRL:
-```python
-df_stock = YahooDownloader(start_date=start_date, end_date=end_date, ticker_list=[ticker]).fetch_data()
-df_benchmark = YahooDownloader(start_date=start_date, end_date=end_date, ticker_list=[benchmark_ticker]).fetch_data()
-```
-
-Data is merged for benchmark comparison:
-```python
-df = pd.merge(df_stock, df_benchmark[['date', 'close']], on='date', suffixes=('', '_benchmark'))
-```
+Stock data is fetched using `YahooDownloader` from FinRL. Data is merged for benchmark comparison to analyze relative performance.
 
 ---
 
-## Reward Functions
+## Reward Function
 
-### Profit & Loss (PnL)
-```python
-Reward = Current Portfolio Value – Previous Portfolio Value
-```
-- Measures daily profit/loss.
-- Prone to early model convergence.
+### Custom Risk-Adjusted Reward Function
+The reward function balances profitability and risk using weighted metrics:
+- **Annualized Return**
+- **Downside Standard Deviation (Risk Penalty)**
+- **Treynor Ratio**
+- **Differential Return vs. Benchmark**
 
-### Moving Average of Return
-```python
-Reward = (1/N) * Σ(Returns over N days)
-```
-- Reduces reward volatility.
+The reward function penalizes excessive downside risk and improves risk-adjusted returns by optimizing tunable weights.
 
-### Custom Reward (Risk-Adjusted)
-```python
-Reward = α × return_moving_average - β × downside_return
-```
-- Balances return and risk using hyperparameters `α` and `β`.
+#### Key Formulas:
 
-### Differential Return
-- Uses risk penalty measurement as described in research papers.
+1. **Annualized Return**  
+   ```
+   R_annual = (1 + R_daily)^252 - 1
+   ```
+   Where:
+   - R_annual = Annualized return
+   - R_daily = Daily return
+   - 252 = Number of trading days in a year
+
+2. **Sharpe Ratio**  
+   ```
+   S = (R_p - R_f) / σ_p
+   ```
+   Where:
+   - R_p = Portfolio return
+   - R_f = Risk-free rate
+   - σ_p = Portfolio standard deviation
+
+3. **Sortino Ratio**  
+   ```
+   S_sortino = (R_p - R_f) / σ_d
+   ```
+   Where:
+   - R_p = Portfolio return
+   - R_f = Risk-free rate
+   - σ_d = Downside deviation (standard deviation of negative returns only)
+
+4. **Treynor Ratio**  
+   ```
+   T = (R_p - R_f) / β_p
+   ```
+   Where:
+   - R_p = Portfolio return
+   - R_f = Risk-free rate
+   - β_p = Portfolio beta (systematic risk)
+
+5. **Differential Return vs. Benchmark**  
+   ```
+   DR = R_p - R_b
+   ```
+   Where:
+   - R_p = Portfolio return
+   - R_b = Benchmark return
+
+6. **Final Weighted Reward Function**  
+   ```
+   Reward = w₁ · R_annual - w₂ · σ_d + w₃ · T + w₄ · DR
+   ```
+   Where:
+   - w₁ = Weight for annualized return
+   - w₂ = Weight for downside risk penalty
+   - w₃ = Weight for Treynor ratio
+   - w₄ = Weight for differential return
+   - σ_d = Downside deviation
+   - T = Treynor ratio
+   - DR = Differential return
+
+### Implementation Notes:
+- Weights (w₁, w₂, w₃, w₄) are hyperparameters that can be tuned
+- Downside deviation only considers returns below the target return
+- Beta (β) is calculated using regression against the market benchmark
+- All returns are calculated on a risk-adjusted basis
+
 
 ---
 
@@ -110,75 +154,44 @@ Reward = α × return_moving_average - β × downside_return
 ### PPO Algorithm
 - **Algorithm**: Proximal Policy Optimization (PPO)
 - **Library**: Stable Baselines3
-- **Vectorized Environment**:
-  ```python
-  vec_env = make_vec_env(lambda: env, n_envs=1)
-  ```
-- **Training the Model**:
-  ```python
-  model = PPO("MlpPolicy", vec_env, verbose=1)
-  model.learn(total_timesteps=100000)
-  ```
-- **Portfolio Value Tracking**:
-  ```python
-  portfolio_values = []
-  while True:
-      action, _ = model.predict(obs, deterministic=True)
-      obs, rewards, done, info = vec_env.step(action)
-      if done[0]: break
-      portfolio_values.append(vec_env.envs[0].unwrapped.asset_memory[-1])
-  ```
+- **Vectorized Environment** is used for training efficiency.
+- **Model Training** is performed over a large number of timesteps to optimize portfolio returns.
 
 ---
 
 ## Results & Evaluation
 
 ### Key Evaluation Metrics
-- **Sharpe Ratio**:
-  ```
-  Sharpe Ratio = (Average Return - Risk-Free Rate) / Std Dev of Returns
-  ```
-- **Sortino Ratio** (focuses on downside risk):
-  ```
-  Sortino Ratio = (Average Return - Risk-Free Rate) / Downside Deviation
-  ```
-- **Treynor Ratio** (accounts for systematic risk using beta):
-  ```
-  Treynor Ratio = (Average Return - Risk-Free Rate) / Beta
-  ```
+- **Sharpe Ratio**: Measures return relative to risk.
+- **Sortino Ratio**: Focuses on downside risk.
+- **Treynor Ratio**: Accounts for systematic risk using beta.
 
 ### Performance Visualization
-Stock price trends are visualized using Matplotlib and Seaborn:
-```python
-sns.lineplot(x=pd.to_datetime(df['date']), y=df['close'], label='Closing Price', color='blue')
-plt.title(f"{ticker} Closing Stock Over Time")
-```
+Performance evaluation includes stock price trends and portfolio value tracking over time.
 
-Final portfolio performance:
-```python
-plt.plot(timesteps, portfolio_values, label="Portfolio Value", color='blue')
-plt.xlabel("Time Steps")
-plt.ylabel("Portfolio Value ($)")
-plt.title("RL Model Performance")
-plt.legend()
-plt.grid()
-plt.show()
-```
+---
 
-![](https://web-api.textin.com/ocr_image/external/f07f35cad64f1308.jpg)
+## Contributors:
+
+Team Name: CJYTHON
+
+* [Uditansh Srivastava](https://github.com/Uditansh-Srivastava)  
+* [Shivam Aryan](https://github.com/Aryan10)  
+* [Shaurya Pratap Singh](https://github.com/shauryasf)
+
+### Made at:
+<a href="https://weekendofcode.computercodingclub.in/"> <img src="https://i.postimg.cc/mrCCnTbN/tpg.jpg" height=30px> </a>
 
 ---
 
 ## Conclusion
 - The RL agent successfully learns trading strategies based on historical stock data.
-- The custom reward function improves risk-adjusted returns compared to naive profit maximization.
-- Future improvements could include testing different RL algorithms (e.g., A2C, DDPG) and incorporating more financial indicators.
+- The custom reward function improves risk-adjusted returns.
+- Future improvements could include testing different RL algorithms (e.g., DDPG) and multi-stock trading strategies.
 
 ---
 
 ## References
-1. FinRL Documentation: https://github.com/AI4Finance-Foundation/FinRL
-2. Stable Baselines3 Documentation: https://stable-baselines3.readthedocs.io/
-3. Differential Return Paper: https://www.researchgate.net/publication/356127405
-
----
+1. [FinRL Documentation](https://github.com/AI4Finance-Foundation/FinRL)  
+2. [Stable Baselines3 Documentation](https://stable-baselines3.readthedocs.io/)  
+3. [Differential Return Paper](https://www.researchgate.net/publication/356127405)
