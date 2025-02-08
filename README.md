@@ -178,6 +178,7 @@ Team Name: CJYTHON
 * [Uditansh Srivastava](https://github.com/Uditansh-Srivastava)  
 * [Shivam Aryan](https://github.com/Aryan10)  
 * [Shaurya Pratap Singh](https://github.com/shauryasf)
+* * [Samudraneel Sarkar](https://github.com/samudraneel05)
 
 ### Made at:
 <a href="https://weekendofcode.computercodingclub.in/"> <img src="https://i.postimg.cc/mrCCnTbN/tpg.jpg" height=30px> </a>
